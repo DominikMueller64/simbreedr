@@ -1,6 +1,6 @@
-library('simbreed')
+library('simbreedr')
 
-simbreed::gamete(parent = individual, xo_params)
+simbreedr::gamete(parent = individual, xo_params)
 
 n_chr <- 10L
 m <- rep(100, n_chr) 
@@ -17,7 +17,7 @@ parent <- create_parent(len = len, alleles = c(0L, 1L), homozygous = FALSE)
 
 
 
-gam <- simbreed::.xo2geno_gamete(xodat = xodat, map = map, founder = founder)
+gam <- simbreedr::.xo2geno_gamete(xodat = xodat, map = map, founder = founder)
 u <- cbind(do.call(rbind, founder),t(gam))
 colMeans(u[u[,1]+u[,2] ==1,])
 
@@ -28,10 +28,10 @@ for (i in 1:5 ){
 individual
 
 
-simbreed::.bcgv(parent = individual, n_gam = 10, n_rep = 10, se_thresh = 0.05,
+simbreedr::.bcgv(parent = individual, n_gam = 10, n_rep = 10, se_thresh = 0.05,
       params = xo_params, map = map, founder = founder, eff = eff)
 
-library(simbreed)
+library(simbreedr)
 devtools::unload()
 devtools::uninstall()
 devtools::install()
@@ -100,7 +100,7 @@ ohv4 = .gamete_value(xodat, map, founder, eff)
 individual <- parent
 
 
-library('simbreed')
+library('simbreedr')
 library('hypred')
 library('magrittr')
 
@@ -112,7 +112,7 @@ n_founder <- 2L
 n_chr <- 10L
 len <- runif(n = n_chr, min = 200, max = 200)
 n_loci <- seq(from = log(5), to = log(1e5), length.out = 15L) %>% exp() %>% ceiling()
-# Benchmarking an comparing the simulation of meiosis in hypred and simbreed.
+# Benchmarking an comparing the simulation of meiosis in hypred and simbreedr.
 ret <- purrr::map_df(n_loci, function(m) {
   map <- .sim_map(m = m, len = len)
   genome <- hypred::hypredGenome(num.chr = n_chr, len.chr = len / 100.0, num.snp.chr = m)
@@ -125,17 +125,17 @@ ret <- purrr::map_df(n_loci, function(m) {
   bench_hypred <- microbenchmark::microbenchmark(times = 5L,
     hypred = hypred::hypredRecombine(genome, genomeA = parent[1L, ], genomeB = parent[2L, ],
                                      mutate = FALSE, block = FALSE),
-    simbreed = for (j in seq_len(n_chr)) {
-      tmp <- simbreed::.sim_meiosis(parent = parent_xodat[[j]], L = len[j], m = 0L, p = 1.0,
+    simbreedr = for (j in seq_len(n_chr)) {
+      tmp <- simbreedr::.sim_meiosis(parent = parent_xodat[[j]], L = len[j], m = 0L, p = 1.0,
                                    obligate_chiasma = FALSE, Lstar = len[j])
-      simbreed:::.xo2geno_chromatid(xodat = tmp, map = map[[j]], founder = founder[[j]])
+      simbreedr:::.xo2geno_chromatid(xodat = tmp, map = map[[j]], founder = founder[[j]])
     }
     # },
     #
     # simcross = for (j in seq_len(n_chr)) {
     #   tmp <- simcross::sim_meiosis(parent = parent_xodat[[j]], m = 0L, p = 1.0,
     #                                obligate_chiasma = FALSE, Lstar = len[j])
-    #   simbreed:::.xo2geno_chromatid(xodat = tmp, map = map[[j]], founder = founder[[j]])
+    #   simbreedr:::.xo2geno_chromatid(xodat = tmp, map = map[[j]], founder = founder[[j]])
     # }
   )
   ret <- as.data.frame(bench_hypred)
@@ -161,7 +161,7 @@ ggsave('/tmp/mytmpfile.pdf')
 
 
 # Test conversion
-library('simbreed')
+library('simbreedr')
 nXO <- 10L
 m <- 10000L
 
@@ -183,7 +183,7 @@ sum((a-b)^2)
 sum((a-c)^2)
 
 # Convert chromosome
-library('simbreed')
+library('simbreedr')
 n_chr <- 10L
 nXO <- 10L
 m <- 10000L
@@ -203,7 +203,7 @@ dim(u)
 
 
 # Convert entire indivdiual/gamete
-library('simbreed')
+library('simbreedr')
 n_chr <- 10L
 nXO <- 1L
 m <- 100L
@@ -306,7 +306,7 @@ sim_meiosis(parent = F1[[1]], L = 100, m = 0, p = 1, obligate_chiasma = FALSE, L
 
 
 # Test speed of simulation of families/populations.
-library('simbreed')
+library('simbreedr')
 n_chr <- 10L
 n_snp <- 10000L
 L <- rep(200, n_chr)

@@ -1,4 +1,4 @@
-#' A package for simulation of populations in plant breeding.
+#' A package for simulations in plant breeding.
 #'
 #' This package provides flexible tools for simulating any kind of population encountered
 #' in plant breeding, like for instance bi-parental populations, synthethic populations, back-
@@ -50,11 +50,11 @@
 #'
 #'
 #'
-#' @author Dominik Mueller (\email{dominikmueller64@yahoo.de})
+#' @author Dominik Mueller (\email{dominikmueller64@@yahoo.de})
 #'
 #' @docType package
-#' @name simbreed
+#' @name simbreedr
 #'
-#' @useDynLib simbreed
+#' @useDynLib simbreedr
 #' @importFrom Rcpp sourceCpp
 NULL

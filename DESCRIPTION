@@ -1,12 +1,12 @@
-Package: simbreed
-Title: What the Package Does (one line, title case)
-Version: 0.0.0.9000
-Authors@R: person("First", "Last", email = "first.last@example.com", role = c("aut", "cre"))
+Package: simbreedr
+Title: A package for simulations in plant breeding.
+Version: 0.0.0
+Authors@R: person("Dominik", "Mueller", email = "dominikmueller64@yahoo.de", role = c("aut", "cre"))
 Maintainer: Dominik Mueller <dominikmueller64@yahoo.de>
-Description: What the package does (one paragraph).
+Description: A package for simulations in plant breeding.
 Depends:
     R (>= 3.3.2)
-License: What license is it under?
+License: GPL-3
 Encoding: UTF-8
 LazyData: true
 LinkingTo: Rcpp, RcppArmadillo
