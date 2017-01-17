@@ -1,6 +1,111 @@
 library('simbreed')
+
+simbreed::gamete(parent = individual, xo_params)
+
+n_chr <- 10L
+m <- rep(100, n_chr) 
+len <- rep(200, n_chr)
+n_founder <- 2L
+
+map <- .sim_map(m = m , len = len)
+
+(founder <- sim_founder(n = n_founder, m = m))
+parent <- create_parent(len = len, alleles = c(0L, 1L), homozygous = FALSE)
+(eff <- purrr::map(m, rnorm))
+(xo_params <- create_xo_params(L = len, m = 0, p = 1.0))
+(xodat <- gamete(parent = parent, xo_params = xo_params))
+
+
+
+gam <- simbreed::.xo2geno_gamete(xodat = xodat, map = map, founder = founder)
+u <- cbind(do.call(rbind, founder),t(gam))
+colMeans(u[u[,1]+u[,2] ==1,])
+
+individual <- parent 
+for (i in 1:5 ){
+  individual <- self(individual, xo_params)
+}
+individual
+
+
+simbreed::.bcgv(parent = individual, n_gam = 10, n_rep = 10, se_thresh = 0.05,
+      params = xo_params, map = map, founder = founder, eff = eff)
+
+library(simbreed)
+devtools::unload()
+devtools::uninstall()
+devtools::install()
+devtools::load_all()
+
+bcgv <- function(ind, n_gam, n_rep, xo_params, map, founder, effects) {
+  cgv <- numeric(n_rep)
+  for (r in seq_len(n_rep)) {
+    tmp <- numeric(n_gam)
+    for (i in seq_len(n_gam)) {
+      ## xodat <- gamete(parent = ind, xo_params = xo_params)
+      ## tmp[i] <- .gamete_value(xodat = xodat, map = map, founder = founder, eff = eff)
+      tmp[i] <- .gamete_value2(parent = ind, params = xo_params,
+                               map = map, founder= founder, eff = eff)
+    }
+    cgv[r] <- max(tmp)
+  }
+  list('bcgv' = mean(cgv), 'se' = sd(cgv) / sqrt(n_rep))
+}
+
+
+microbenchmark::microbenchmark(times = 10,
+bcgv(individual, 10, 100, xo_params, map, founder, eff),
+.bcgv(individual, 10, 100, xo_params, map, founder, eff)
+)
+
+bcgv(individual, 10, 1000, xo_params, map, founder, eff)
+.bcgv(individual, 10, 10, xo_params, map, founder, eff)
+
+confi <- function(bcgv) {
+  m <- bcgv$bcgv
+  se <- bcgv$se
+  c(m - 1.96*se, m + 1.96*se)
+}
+
+confi(.bcgv(individual, 10, 10, xo_params, map, founder, eff))
+
+microbenchmark::microbenchmark(times = 1,
+x <- purrr::flatten_dbl(purrr::rerun(1000, max(ohv(n = 10, individual, xo_params, eff)))),
+x <- purrr::flatten_dbl(purrr::rerun(1000, max(ohv2(n = 10, individual, xo_params, eff))))
+## x <- purrr::flatten_dbl(purrr::rerun(100, max(ohv(n = 1, individual, xo_params, eff))))
+)
+
+quantile(x)
+(mu <- mean(x));
+sdv <- sd(x) / sqrt(length(x))
+pnorm(mu-0.01, mean = mu, sd = sdv, lower.tail = TRUE)
+qnorm(0.01, mean = mu, sd = sdv, lower.tail = TRUE)
+plot(density(x))
+
+
+
+microbenchmark::microbenchmark(times = 100,
+ohv1 = sum(purrr::pmap_dbl(.l = list(xodat, map, founder, eff),
+                .f = function(x, m, f, e) {
+                  .xo2geno_chromatid(xodat = x, map = m, founder = f) %*% e
+                })),
+ohv2 = sum(purrr::pmap_dbl(.l = list(xodat, map, founder, eff),
+                .f = function(x, m, f, e) {
+                  .chromatid_value(xodat = x, map = m, founder = f, eff = e)
+                })),
+ohv = .xo2geno_gamete(xodat = xodat, map = map, founder = founder) %*% unlist(eff),
+ohv4 = .gamete_value(xodat, map, founder, eff)
+)
+
+individual <- parent
+
+
+library('simbreed')
 library('hypred')
 library('magrittr')
+
+
+
 
 nXO <- 0L
 n_founder <- 2L
@@ -52,7 +157,7 @@ plt <- ggplot(data = ret, mapping = aes(x = m, y = time, color = expr)) +
   labs(y = 'execution time in milliseconds', x = 'number of loci per chromosome') #+
   # coord_cartesian(ylim = c(0.001, max(ret$time)))
 
-ggsave('/tmp/mytmpfile.png')
+ggsave('/tmp/mytmpfile.pdf')
 
 
 # Test conversion

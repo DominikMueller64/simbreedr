@@ -5,6 +5,7 @@ using namespace Rcpp;
 using namespace arma;
 using namespace std;
 // #include "convert.h"
+#include "sim_meiosis.h"
 
 // arma::rowvec xo2geno_chromatid_reliable(const List& xodat,
 //                                         const arma::vec& map,
@@ -51,6 +52,154 @@ using namespace std;
 //   }
 //   return out;
 // }
+
+//' @export
+//[[Rcpp::export(".chromatid_value")]]
+double chromatid_value(const List& xodat,
+                       const arma::vec& map,
+                       const arma::mat& founder,
+                       const arma::vec& eff)
+{
+  const arma::ivec alleles = xodat[0];
+  const arma::vec locations = xodat[1];
+
+  double out = 0;
+  arma::uword ix1 = 0;
+  arma::uword ix2;
+  for (arma::uword j = 0; j < locations.n_elem; ++j) {
+    auto it = std::upper_bound(map.begin() + ix1, map.end(), locations[j]);
+    ix2 = it - map.begin();
+    for (arma::uword i = ix1; i < ix2; ++i) {
+      out += arma::as_scalar(founder.at(i, alleles[j]) * eff[i]);
+    }
+    ix1 = ix2;
+  }
+  return out;
+}
+
+
+
+//' @export
+// [[Rcpp::export('.gamete_value')]]
+double gamete_value(const Rcpp::List& xodat,
+                    const Rcpp::List& map,
+                    const Rcpp::List& founder,
+                    const Rcpp::List& eff)
+{
+  double out = 0;
+  for (arma::uword i = 0; i < map.size(); ++i)
+    out += chromatid_value(xodat[i], map[i], founder[i], eff[i]);
+  return out;
+}
+
+
+// Rcpp::List gamete_value2(const List& parent,
+//                          const List& params,
+//                          const Rcpp::List& map,
+//                          const Rcpp::List& founder,
+//                          const Rcpp::List& eff)
+// {
+//   const unsigned int n_chrom = parent.size();
+//   const bool homozygous = parent.attr("homozygous");
+//   const arma::vec L = params["L"];
+//   const arma::vec Lstar = params["Lstar"];
+//   const unsigned int m = params["m"];
+//   const double p = params["p"];
+//   const bool obligate_chiasma = params["obligate_chiasma"];
+//   Rcpp::List xodat;
+//   double out;
+//   for (unsigned int i = 0; i < n_chrom; ++i) {
+//     if (homozygous) {
+//       xodat = parent[i];
+//     } else {
+//       xodat = sim_meiosis(parent[i], L[i], m, p, obligate_chiasma, Lstar[i]);
+//     }
+//     out += chromatid_value(xodat, map[i], founder[i], eff[i]);
+//   }
+//   return out;
+// }
+
+//' @export
+// [[Rcpp::export('.gamete_value2')]]
+double gamete_value2(const List& parent,
+                     const List& params,
+                     const Rcpp::List& map,
+                     const Rcpp::List& founder,
+                     const Rcpp::List& eff)
+{
+  const unsigned int n_chrom = parent.size();
+  const bool homozygous = parent.attr("homozygous");
+  const arma::vec L = params["L"];
+  const arma::vec Lstar = params["Lstar"];
+  const unsigned int m = params["m"];
+  const double p = params["p"];
+  const bool obligate_chiasma = params["obligate_chiasma"];
+  Rcpp::List xodat;
+  double out = 0;
+  for (unsigned int i = 0; i < n_chrom; ++i) {
+    if (homozygous) {
+      xodat = parent[i];
+    } else {
+      xodat = sim_meiosis(parent[i], L[i], m, p, obligate_chiasma, Lstar[i]);
+    }
+    out += chromatid_value(xodat, map[i], founder[i], eff[i]);
+  }
+  return out;
+}
+
+
+// //' @export
+// // [[Rcpp::export('.bcgv')]]
+// Rcpp::List bcgv(const List& parent,
+//                 const int n_gam,
+//                 const int n_rep,
+//                 const List& params,
+//                 const Rcpp::List& map,
+//                 const Rcpp::List& founder,
+//                 const Rcpp::List& eff)
+// {
+//   arma::vec cgv(n_rep);
+//   for (arma::uword r = 0; r < n_rep; ++r) {
+//     arma::vec tmp(n_gam);
+//     for (arma::uword i = 0; i < n_gam; ++i) {
+//       tmp[i] = gamete_value2(parent, params, map, founder, eff);
+//     }
+//     cgv[r] = arma::max(tmp);
+//   }
+//   return Rcpp::List::create(Rcpp::Named("bcgv") = arma::mean(cgv),
+//                             Rcpp::Named("se") = arma::stddev(cgv) / std::sqrt(cgv.size()));
+// }
+
+//' @export
+// [[Rcpp::export('.bcgv')]]
+Rcpp::List bcgv(const List& parent,
+                const int n_gam,
+                const int n_rep,
+                const double se_thresh,
+                const List& params,
+                const Rcpp::List& map,
+                const Rcpp::List& founder,
+                const Rcpp::List& eff
+                )
+{
+  arma::running_stat<double> cgv;
+  double se;
+  int ct;
+  do {
+    arma::running_stat<double> gv;
+    for (arma::uword i = 0; i < n_gam; ++i) {
+      gv(gamete_value2(parent, params, map, founder, eff));
+    }
+    cgv(gv.max());
+    ct = cgv.count();
+    se = cgv.stddev()/std::sqrt(ct);
+  } while (ct < n_rep || se_thresh < se);
+
+    return Rcpp::List::create(Rcpp::Named("bcgv") = cgv.mean(),
+                              Rcpp::Named("se") = se,
+                              Rcpp::Named("n") = ct);
+}
+
 
 
 //' @export

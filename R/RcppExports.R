@@ -2,6 +2,26 @@
 # Generator token: 10BE3573-1514-4C36-9D1C-5A225CD40393
 
 #' @export
+.chromatid_value <- function(xodat, map, founder, eff) {
+    .Call('simbreed_chromatid_value', PACKAGE = 'simbreed', xodat, map, founder, eff)
+}
+
+#' @export
+.gamete_value <- function(xodat, map, founder, eff) {
+    .Call('simbreed_gamete_value', PACKAGE = 'simbreed', xodat, map, founder, eff)
+}
+
+#' @export
+.gamete_value2 <- function(parent, params, map, founder, eff) {
+    .Call('simbreed_gamete_value2', PACKAGE = 'simbreed', parent, params, map, founder, eff)
+}
+
+#' @export
+.bcgv <- function(parent, n_gam, n_rep, se_thresh, params, map, founder, eff) {
+    .Call('simbreed_bcgv', PACKAGE = 'simbreed', parent, n_gam, n_rep, se_thresh, params, map, founder, eff)
+}
+
+#' @export
 .xo2geno_chromatid <- function(xodat, map, founder) {
     .Call('simbreed_xo2geno_chromatid', PACKAGE = 'simbreed', xodat, map, founder)
 }

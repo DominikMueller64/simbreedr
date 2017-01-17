@@ -18,7 +18,6 @@ Rcpp::List gamete(const List& parent,
   const double p = params["p"];
   const bool obligate_chiasma = params["obligate_chiasma"];
   for (unsigned int i = 0; i < n_chrom; ++i) {
-    Rcpp::List gam;
     if (homozygous) {
       ret[i] = parent[i];
     } else {

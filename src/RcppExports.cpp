@@ -6,6 +6,67 @@
 
 using namespace Rcpp;
 
+// chromatid_value
+double chromatid_value(const List& xodat, const arma::vec& map, const arma::mat& founder, const arma::vec& eff);
+RcppExport SEXP simbreed_chromatid_value(SEXP xodatSEXP, SEXP mapSEXP, SEXP founderSEXP, SEXP effSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const List& >::type xodat(xodatSEXP);
+    Rcpp::traits::input_parameter< const arma::vec& >::type map(mapSEXP);
+    Rcpp::traits::input_parameter< const arma::mat& >::type founder(founderSEXP);
+    Rcpp::traits::input_parameter< const arma::vec& >::type eff(effSEXP);
+    rcpp_result_gen = Rcpp::wrap(chromatid_value(xodat, map, founder, eff));
+    return rcpp_result_gen;
+END_RCPP
+}
+// gamete_value
+double gamete_value(const Rcpp::List& xodat, const Rcpp::List& map, const Rcpp::List& founder, const Rcpp::List& eff);
+RcppExport SEXP simbreed_gamete_value(SEXP xodatSEXP, SEXP mapSEXP, SEXP founderSEXP, SEXP effSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const Rcpp::List& >::type xodat(xodatSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::List& >::type map(mapSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::List& >::type founder(founderSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::List& >::type eff(effSEXP);
+    rcpp_result_gen = Rcpp::wrap(gamete_value(xodat, map, founder, eff));
+    return rcpp_result_gen;
+END_RCPP
+}
+// gamete_value2
+double gamete_value2(const List& parent, const List& params, const Rcpp::List& map, const Rcpp::List& founder, const Rcpp::List& eff);
+RcppExport SEXP simbreed_gamete_value2(SEXP parentSEXP, SEXP paramsSEXP, SEXP mapSEXP, SEXP founderSEXP, SEXP effSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const List& >::type parent(parentSEXP);
+    Rcpp::traits::input_parameter< const List& >::type params(paramsSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::List& >::type map(mapSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::List& >::type founder(founderSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::List& >::type eff(effSEXP);
+    rcpp_result_gen = Rcpp::wrap(gamete_value2(parent, params, map, founder, eff));
+    return rcpp_result_gen;
+END_RCPP
+}
+// bcgv
+Rcpp::List bcgv(const List& parent, const int n_gam, const int n_rep, const double se_thresh, const List& params, const Rcpp::List& map, const Rcpp::List& founder, const Rcpp::List& eff);
+RcppExport SEXP simbreed_bcgv(SEXP parentSEXP, SEXP n_gamSEXP, SEXP n_repSEXP, SEXP se_threshSEXP, SEXP paramsSEXP, SEXP mapSEXP, SEXP founderSEXP, SEXP effSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const List& >::type parent(parentSEXP);
+    Rcpp::traits::input_parameter< const int >::type n_gam(n_gamSEXP);
+    Rcpp::traits::input_parameter< const int >::type n_rep(n_repSEXP);
+    Rcpp::traits::input_parameter< const double >::type se_thresh(se_threshSEXP);
+    Rcpp::traits::input_parameter< const List& >::type params(paramsSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::List& >::type map(mapSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::List& >::type founder(founderSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::List& >::type eff(effSEXP);
+    rcpp_result_gen = Rcpp::wrap(bcgv(parent, n_gam, n_rep, se_thresh, params, map, founder, eff));
+    return rcpp_result_gen;
+END_RCPP
+}
 // xo2geno_chromatid
 arma::rowvec xo2geno_chromatid(const List& xodat, const arma::vec& map, const arma::mat& founder);
 RcppExport SEXP simbreed_xo2geno_chromatid(SEXP xodatSEXP, SEXP mapSEXP, SEXP founderSEXP) {
